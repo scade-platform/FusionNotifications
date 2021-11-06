@@ -1,15 +1,15 @@
 import Foundation
 
 public protocol Notification {
-  var content: NotificationContent { get }
-  var trigger: NotificationTrigger { get }
+  var content: NotificationContent? { get }
+  var trigger: NotificationTrigger? { get }
 }
 
 
 public struct NotificationContent {
-  var title: String = ""
-  var body: String = ""
-  var category: String = ""
+  public var title: String = ""
+  public var body: String = ""
+  public var category: String = ""
   
   // TODO: to be extended based on iOS and Android API
 }
@@ -25,7 +25,7 @@ public protocol NotificationTrigger {
 // BUT, the API should be the same for both OSes
 
 public struct TimeNotificationTrigger: NotificationTrigger {
-  var timeInterval: Double
+  public var timeInterval: Double
   public var repeats: Bool
 }
 
@@ -42,13 +42,13 @@ public struct PushNotificationTrigger {
 }
 
 public struct NotificationCategory {
-  var identifier: String
-  var actions: [NotificationAction]
+  public var identifier: String
+  public var actions: [NotificationAction]
 }
 
 public struct NotificationAction {
-  var identifier: String
-  var title: String
+  public var identifier: String
+  public var title: String
 }
 
 
@@ -66,16 +66,10 @@ public protocol NotificationManagerProtocol {
            trigger: NotificationTrigger)
   
   // Removes a pending notification
-  func remove(identifier: String)
-  
+  func remove(identifier: String)  
 }
 
-
-// Has to be implemented by the app to receive notification
 public protocol NotificationDelegate {
-
   func didReceive(notification: Notification, userActionIdentifier: String)
-  
-  // Look at the iOS docs
   func willPresent(notification: Notification)
 }

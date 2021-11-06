@@ -1,8 +1,12 @@
 #if os(macOS) || os(iOS)
-import FusionNotification_Common
+import FusionNotifications_Common
 import UserNotifications
 
-public class NotificationManager: NSObject, NotificationManagerProtocol {
+public class NotificationManager: NSObject, NotificationManagerProtocol, FusionNotifications_Common.Notification {
+  public var content: NotificationContent?
+  
+  public var trigger: NotificationTrigger?
+  
   public static var shared = NotificationManager()
   
   public var delegate: NotificationDelegate?
@@ -13,6 +17,7 @@ public class NotificationManager: NSObject, NotificationManagerProtocol {
   
   public required override init() {
     self.categories = []
+    super.init()
   }
   
   public func registerNotificationCategory(category: NotificationCategory) {
@@ -25,6 +30,7 @@ public class NotificationManager: NSObject, NotificationManagerProtocol {
       return UNNotificationCategory(identifier: category.identifier, actions: unActions, intentIdentifiers: [], options: [])
     }
     userNotificationCenter.setNotificationCategories(Set(unCategories))
+    userNotificationCenter.delegate = self
   }
   
   public func add(identifier: String, content: NotificationContent, trigger: NotificationTrigger) {
@@ -38,7 +44,10 @@ public class NotificationManager: NSObject, NotificationManagerProtocol {
       let unRequest = UNNotificationRequest(identifier: identifier, content: unContent, trigger: unTrigger)
       userNotificationCenter.add(unRequest) { error in
         if let error = error {
-            print("Unable to Add Notification Request (\(error), \(error.localizedDescription))")
+          print("Unable to Add Notification Request (\(error), \(error.localizedDescription))")
+        } else {
+          self.content = content
+          self.trigger = trigger
         }
       }
     }
@@ -51,18 +60,13 @@ public class NotificationManager: NSObject, NotificationManagerProtocol {
 
 extension NotificationManager: UNUserNotificationCenterDelegate {
   public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-    switch response.actionIdentifier {
-    case response.actionIdentifier:
-        print("Read tapped")
-    default:
-        print("Other Action")
-    }
-
+    self.delegate?.didReceive(notification: self, userActionIdentifier: response.actionIdentifier)
     completionHandler()
   }
   
   public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-    completionHandler(.list)
+    self.delegate?.willPresent(notification: self)
+    completionHandler(.alert)
   }
 }
 #endif
