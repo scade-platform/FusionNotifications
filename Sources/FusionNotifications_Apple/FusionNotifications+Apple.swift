@@ -18,6 +18,7 @@ public class NotificationManager: NSObject, NotificationManagerProtocol, FusionN
   public required override init() {
     self.categories = []
     super.init()
+    userNotificationCenter.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in    }    
   }
   
   public func registerNotificationCategory(category: NotificationCategory) {
@@ -25,12 +26,7 @@ public class NotificationManager: NSObject, NotificationManagerProtocol, FusionN
       self.categories.append(category)
     }
     
-    let unCategories = self.categories.map { category -> UNNotificationCategory in
-      let unActions = category.actions.map({ UNNotificationAction(identifier: $0.identifier, title: $0.title, options: [])})
-      return UNNotificationCategory(identifier: category.identifier, actions: unActions, intentIdentifiers: [], options: [])
-    }
-    userNotificationCenter.setNotificationCategories(Set(unCategories))
-    userNotificationCenter.delegate = self
+    userNotificationCenter.requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in      if granted {        let unCategories = self.categories.map { category -> UNNotificationCategory in          let unActions = category.actions.map({ UNNotificationAction(identifier: $0.identifier, title: $0.title, options: [])})          return UNNotificationCategory(identifier: category.identifier, actions: unActions, intentIdentifiers: [], options: [])        }        self.userNotificationCenter.setNotificationCategories(Set(unCategories))        self.userNotificationCenter.delegate = self      }    }
   }
   
   public func add(identifier: String, content: NotificationContent, trigger: NotificationTrigger) {
