@@ -2,4 +2,4 @@
 
 
 
-<img src="/screenshot/notificationsample.png" width="40"/>
+<img src="/screenshot/notificationsample.png" width="200"/>
