@@ -1,3 +1,3 @@
 # FusionNotifications [Work-in-Progress]
 
-![Alt Text](/screenshot/notificationsample.png)
+![Alt Text](/screenshot/notificationsample.png width=200)
